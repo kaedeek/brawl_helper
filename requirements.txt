@@ -1,0 +1,5 @@
+VersaLo
+discord.py
+python-dotenv
+requests
+uv
