@@ -1,6 +1,7 @@
 TEXT = {
     "events_title": "📅 ブロスタイベント",
     "fetch_error": "取得失敗",
+    "ranking_title": "🏆 日本ランキング",
 
     "modes": {
         "brawlBall": "ブロストライカー",

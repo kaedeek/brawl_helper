@@ -2,4 +2,5 @@ VersaLo
 discord.py
 python-dotenv
 requests
+watchfiles
 uv

@@ -1,9 +1,35 @@
 from VersaLog import *
 import aiohttp
+import json
 
-logger = VersaLog(enum="detailed", tag=["BASE", "TRANSLATOR"], show_tag=True)
+logger = VersaLog(
+    enum="detailed",
+    tag=["TRANSLATOR"],
+    show_tag=True
+)
 
-CACHE = {}
+MAP_FILE = "locales/maps_ja.json"
+
+
+def load_cache():
+    try:
+        with open(MAP_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return {}
+
+
+def save_cache(cache: dict):
+    with open(MAP_FILE, "w", encoding="utf-8") as f:
+        json.dump(
+            cache,
+            f,
+            ensure_ascii=False,
+            indent=4
+        )
+
+
+CACHE = load_cache()
 
 
 async def translate(text: str, target="ja"):
@@ -31,9 +57,10 @@ async def translate(text: str, target="ja"):
                 )
 
                 CACHE[text] = translated
+                save_cache(CACHE)
 
                 logger.info(
-                    f"Translated: {text} -> {translated}"
+                    f"Saved: {text} -> {translated}"
                 )
 
                 return translated
