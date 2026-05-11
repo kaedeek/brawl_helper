@@ -13,7 +13,10 @@ brawl_helper/
 ├── api/
 │   ├── __init__.py
 │   └── brawl.py
-├── .env
+├── locales/
+│   ├── en.py
+│   ├── ja.py
+│   └── maps_ja.json
 ├── .gitignore
 ├── .python-version
 ├── main.py
