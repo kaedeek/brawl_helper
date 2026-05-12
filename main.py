@@ -7,6 +7,8 @@ import os
 
 from api import (
     event_rotation,
+    brawler,
+    brawlers,
     player,
     club,
     ranking_players
@@ -53,6 +55,24 @@ async def help(ctx):
     embed.add_field(
         name="📅 イベント",
         value="`!events`\n現在のイベント一覧を表示",
+        inline=False
+    )
+
+    embed.add_field(
+        name="🦸 キャラクター一覧",
+        value="`!brawlerslist`",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="🦸 キャラクター詳細",
+        value="`!brawlerinfo ID`",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="🔎 キャラクター検索",
+        value="`!brawlersearch 名前`",
         inline=False
     )
 
@@ -110,6 +130,80 @@ async def events(ctx):
 
     await ctx.send(embed=embed)
 
+@bot.command()
+async def brawlerslist(ctx):
+    data = await brawlers()
+
+    if not data:
+        await ctx.send(t["fetch_error"])
+        return
+
+    embed = discord.Embed(
+        title="🦸 Brawlers",
+        color=0x9b59b6
+    )
+
+    names = []
+
+    for item in data["items"]:
+        names.append(item["name"])
+
+    embed.description = "\n".join(names[:30])
+
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def brawlerinfo(ctx, id: str):
+    data = await brawler(id)
+
+    if not data:
+        await ctx.send(t["fetch_error"])
+        return
+
+    embed = discord.Embed(
+        title=f"🦸 {data['name']}",
+        color=0xf1c40f
+    )
+
+    embed.add_field(
+        name="ID",
+        value=data["id"],
+        inline=True
+    )
+
+    embed.add_field(
+        name="⭐ Star Powers",
+        value=len(data["starPowers"]),
+        inline=True
+    )
+
+    embed.add_field(
+        name="⚙️ Gadgets",
+        value=len(data["gadgets"]),
+        inline=True
+    )
+
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def brawlersearch(ctx, *, name: str):
+    data = await brawlers()
+
+    if not data:
+        await ctx.send(t["fetch_error"])
+        return
+
+    name = name.lower()
+
+    for item in data["items"]:
+        if item["name"].lower() == name:
+            await brawlerinfo(
+                ctx,
+                str(item["id"])
+            )
+            return
+
+    await ctx.send("見つかりませんでした")
 
 @bot.command()
 async def playerinfo(ctx, tag: str):
@@ -129,7 +223,6 @@ async def playerinfo(ctx, tag: str):
     embed.add_field(name="⭐ Level", value=data["expLevel"])
 
     await ctx.send(embed=embed)
-
 
 @bot.command()
 async def clubinfo(ctx, tag: str):
