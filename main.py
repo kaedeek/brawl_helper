@@ -161,26 +161,72 @@ async def brawlerinfo(ctx, id: str):
         return
 
     embed = discord.Embed(
-        title=f"🦸 {data['name']}",
+        title=f"🦸 {data.get('name', 'Unknown')}",
+        description=f"ID: {data.get('id', 'Unknown')}",
         color=0xf1c40f
     )
 
+    rarity = data.get("rarity", {}).get(
+        "name",
+        "不明"
+    )
+
+    star_powers = "\n".join(
+        [
+            f"⭐ {sp['name']}"
+            for sp in data.get("starPowers", [])
+        ]
+    ) or "なし"
+
+    gadgets = "\n".join(
+        [
+            f"⚙️ {g['name']}"
+            for g in data.get("gadgets", [])
+        ]
+    ) or "なし"
+
+    hypercharge = "なし"
+
+    if "hypercharge" in data:
+        hypercharge = data["hypercharge"].get(
+            "name",
+            "あり"
+        )
+
     embed.add_field(
-        name="ID",
-        value=data["id"],
+        name="🏅 レア度",
+        value=rarity,
         inline=True
     )
 
     embed.add_field(
-        name="⭐ Star Powers",
-        value=len(data["starPowers"]),
-        inline=True
+        name="⭐ スターパワー",
+        value=star_powers,
+        inline=False
     )
 
     embed.add_field(
-        name="⚙️ Gadgets",
-        value=len(data["gadgets"]),
-        inline=True
+        name="⚙️ ガジェット",
+        value=gadgets,
+        inline=False
+    )
+
+    embed.add_field(
+        name="⚡ ハイパーチャージ",
+        value=hypercharge,
+        inline=False
+    )
+
+    image_url = (
+        data.get("imageUrl2")
+        or data.get("imageUrl")
+    )
+
+    if image_url:
+        embed.set_thumbnail(url=image_url)
+
+    embed.set_footer(
+        text="Brawl Stars Character Info"
     )
 
     await ctx.send(embed=embed)
@@ -214,13 +260,87 @@ async def playerinfo(ctx, tag: str):
         return
 
     embed = discord.Embed(
-        title=f"👤 {data['name']}",
+        title=f"👤 {data.get('name', 'Unknown')}",
+        description=f"Tag: {data.get('tag', 'Unknown')}",
         color=0x3498db
     )
 
-    embed.add_field(name="🏆 Trophy", value=data["trophies"])
-    embed.add_field(name="📈 Highest", value=data["highestTrophies"])
-    embed.add_field(name="⭐ Level", value=data["expLevel"])
+    embed.add_field(
+        name="🏆 トロフィー",
+        value=data.get("trophies", 0),
+        inline=True
+    )
+
+    embed.add_field(
+        name="📈 最高トロフィー",
+        value=data.get("highestTrophies", 0),
+        inline=True
+    )
+
+    embed.add_field(
+        name="⭐ レベル",
+        value=data.get("expLevel", 0),
+        inline=True
+    )
+
+    embed.add_field(
+        name="⚔️ 3v3勝利",
+        value=data.get("3vs3Victories", 0),
+        inline=True
+    )
+
+    embed.add_field(
+        name="🥇 ソロ勝利",
+        value=data.get("soloVictories", 0),
+        inline=True
+    )
+
+    embed.add_field(
+        name="👥 デュオ勝利",
+        value=data.get("duoVictories", 0),
+        inline=True
+    )
+
+    club_name = "なし"
+    if data.get("club"):
+        club_name = data["club"].get(
+            "name",
+            "なし"
+        )
+
+    embed.add_field(
+        name="🏰 クラブ",
+        value=club_name,
+        inline=False
+    )
+
+    favorite = data.get(
+        "favoriteBrawler",
+        {}
+    ).get(
+        "name",
+        "なし"
+    )
+
+    embed.add_field(
+        name="❤️ Favorite Brawler",
+        value=favorite,
+        inline=False
+    )
+
+    icon_id = data.get(
+        "icon",
+        {}
+    ).get("id")
+
+    if icon_id:
+        embed.set_thumbnail(
+            url=f"https://cdn.brawlify.com/profile-icons/regular/{icon_id}.png"
+        )
+
+    embed.set_footer(
+        text="Brawl Stars Player Info"
+    )
 
     await ctx.send(embed=embed)
 
